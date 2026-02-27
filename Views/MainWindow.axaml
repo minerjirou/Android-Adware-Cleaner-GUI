@@ -47,25 +47,25 @@
                     <Button Classes="nav" Command="{Binding SelectTabCommand}" CommandParameter="0">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <TextBlock Text="📡" FontSize="16"/>
-                            <TextBlock Text="Monitor" VerticalAlignment="Center"/>
+                            <TextBlock Text="モニター" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="nav" Command="{Binding SelectTabCommand}" CommandParameter="1">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <TextBlock Text="📋" FontSize="16"/>
-                            <TextBlock Text="Inventory" VerticalAlignment="Center"/>
+                            <TextBlock Text="アプリ一覧" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="nav" Command="{Binding SelectTabCommand}" CommandParameter="2">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <TextBlock Text="🔍" FontSize="16"/>
-                            <TextBlock Text="Inspect" VerticalAlignment="Center"/>
+                            <TextBlock Text="詳細検査" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="nav" Command="{Binding SelectTabCommand}" CommandParameter="3">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <TextBlock Text="⚡" FontSize="16"/>
-                            <TextBlock Text="Actions" VerticalAlignment="Center"/>
+                            <TextBlock Text="実行アクション" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>

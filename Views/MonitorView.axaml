@@ -6,7 +6,7 @@
     <DockPanel Margin="24">
         <!-- ヘッダー -->
         <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
-            <TextBlock Text="📡 Monitor" FontSize="22" FontWeight="Bold"
+            <TextBlock Text="📡 モニター" FontSize="22" FontWeight="Bold"
                        Foreground="{StaticResource TextPrimaryBrush}"
                        VerticalAlignment="Center"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">

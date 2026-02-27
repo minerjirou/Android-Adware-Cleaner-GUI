@@ -6,7 +6,7 @@
     <DockPanel Margin="24">
         <!-- ヘッダー -->
         <TextBlock DockPanel.Dock="Top"
-                   Text="⚡ Actions" FontSize="22" FontWeight="Bold"
+                   Text="⚡ 実行アクション" FontSize="22" FontWeight="Bold"
                    Foreground="{StaticResource TextPrimaryBrush}"
                    Margin="0,0,0,16"/>
 
@@ -28,15 +28,15 @@
 
                 <!-- アクションボタン -->
                 <WrapPanel Orientation="Horizontal">
-                    <Button Classes="outline" Content="🔒 Quarantine"
+                    <Button Classes="outline" Content="🔒 無効化 (Quarantine)"
                             Margin="0,0,8,0"
                             Command="{Binding QuarantineCommand}"
                             IsEnabled="{Binding !IsBusy}"/>
-                    <Button Classes="danger" Content="🗑 Remove"
+                    <Button Classes="danger" Content="🗑 削除 (Remove)"
                             Margin="0,0,8,0"
                             Command="{Binding RemoveCommand}"
                             IsEnabled="{Binding !IsBusy}"/>
-                    <Button Classes="outline" Content="♻ Restore"
+                    <Button Classes="outline" Content="♻ 復元 (Restore)"
                             Command="{Binding RestoreCommand}"
                             IsEnabled="{Binding !IsBusy}"/>
                 </WrapPanel>

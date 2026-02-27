@@ -6,7 +6,7 @@
     <DockPanel Margin="24">
         <!-- ヘッダー -->
         <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
-            <TextBlock Text="📋 Inventory" FontSize="22" FontWeight="Bold"
+            <TextBlock Text="📋 アプリ一覧" FontSize="22" FontWeight="Bold"
                        Foreground="{StaticResource TextPrimaryBrush}"
                        VerticalAlignment="Center"/>
             <Button Classes="primary" Content="🔄 一覧更新"
@@ -47,7 +47,7 @@
                                        HorizontalAlignment="Center"/>
                             <Button Grid.Column="2"
                                     Classes="outline"
-                                    Content="🔍 Inspect"
+                                    Content="🔍 詳細検査"
                                     FontSize="11" Padding="8,4"
                                     Command="{Binding $parent[ListBox].((vm:InventoryViewModel)DataContext).InspectCommand}"
                                     CommandParameter="{Binding}"/>
