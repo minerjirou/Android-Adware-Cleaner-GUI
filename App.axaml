@@ -1,0 +1,144 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AdwScanGui.App"
+             xmlns:local="using:AdwScanGui"
+             RequestedThemeVariant="Dark">
+
+    <Application.Resources>
+        <!-- Color Palette -->
+        <Color x:Key="BgBase">#0F1117</Color>
+        <Color x:Key="BgSurface">#1A1D27</Color>
+        <Color x:Key="BgElevated">#242836</Color>
+        <Color x:Key="AccentGreen">#3DDC84</Color>
+        <Color x:Key="AccentGreenDark">#2AA864</Color>
+        <Color x:Key="TextPrimary">#E8EAF0</Color>
+        <Color x:Key="TextSecondary">#8B90A0</Color>
+        <Color x:Key="LevelLow">#3DDC84</Color>
+        <Color x:Key="LevelMedium">#FFB300</Color>
+        <Color x:Key="LevelHigh">#FF6D00</Color>
+        <Color x:Key="LevelCritical">#D32F2F</Color>
+
+        <SolidColorBrush x:Key="BgBaseBrush"     Color="{StaticResource BgBase}" />
+        <SolidColorBrush x:Key="BgSurfaceBrush"  Color="{StaticResource BgSurface}" />
+        <SolidColorBrush x:Key="BgElevatedBrush" Color="{StaticResource BgElevated}" />
+        <SolidColorBrush x:Key="AccentBrush"     Color="{StaticResource AccentGreen}" />
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}" />
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}" />
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Fonts.Inter/Fonts.axaml"/>
+
+        <Style Selector="Window">
+            <Setter Property="Background" Value="{StaticResource BgBaseBrush}" />
+            <Setter Property="FontFamily" Value="Inter, Segoe UI, sans-serif" />
+        </Style>
+
+        <!-- Sidebar nav button -->
+        <Style Selector="Button.nav">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="Padding" Value="14,12" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.18" />
+                    <BrushTransition Property="Foreground" Duration="0:0:0.18" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.nav:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource BgElevatedBrush}" />
+        </Style>
+        <Style Selector="Button.nav.active">
+            <Setter Property="Background" Value="{StaticResource BgElevatedBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+        </Style>
+
+        <!-- Primary action button -->
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+            <Setter Property="Foreground" Value="#0F1117" />
+            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.primary:pointerover">
+            <Setter Property="RenderTransform" Value="scale(1.04)" />
+        </Style>
+        <Style Selector="Button.primary:pressed">
+            <Setter Property="RenderTransform" Value="scale(0.97)" />
+        </Style>
+
+        <!-- Danger button -->
+        <Style Selector="Button.danger">
+            <Setter Property="Background" Value="#D32F2F" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.danger:pointerover">
+            <Setter Property="RenderTransform" Value="scale(1.04)" />
+        </Style>
+
+        <!-- Outline button -->
+        <Style Selector="Button.outline">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="14,7" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.outline:pointerover">
+            <Setter Property="RenderTransform" Value="scale(1.03)" />
+        </Style>
+
+        <!-- Card panel -->
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{StaticResource BgSurfaceBrush}" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="18" />
+        </Style>
+
+        <!-- TextBox dark -->
+        <Style Selector="TextBox">
+            <Setter Property="Background" Value="{StaticResource BgElevatedBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="BorderBrush" Value="#333850" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="10,8" />
+        </Style>
+
+        <!-- ListBox dark -->
+        <Style Selector="ListBox">
+            <Setter Property="Background" Value="{StaticResource BgElevatedBrush}" />
+            <Setter Property="CornerRadius" Value="8" />
+        </Style>
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="8,4" />
+        </Style>
+        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#2A2F42" />
+        </Style>
+    </Application.Styles>
+</Application>
