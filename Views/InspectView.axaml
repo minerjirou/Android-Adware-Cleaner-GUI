@@ -1,0 +1,91 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AdwScanGui.ViewModels"
+             x:Class="AdwScanGui.Views.InspectView"
+             x:DataType="vm:InspectViewModel">
+    <ScrollViewer>
+        <StackPanel Margin="24" Spacing="16">
+            <!-- ヘッダー -->
+            <TextBlock Text="🔍 Inspect" FontSize="22" FontWeight="Bold"
+                       Foreground="{StaticResource TextPrimaryBrush}"/>
+
+            <!-- パッケージ入力 -->
+            <Border Classes="card">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="パッケージ名" FontSize="12"
+                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBox Grid.Column="0"
+                                 Text="{Binding PackageName}"
+                                 Watermark="例: com.example.suspicious"
+                                 Margin="0,0,8,0"/>
+                        <Button Grid.Column="1" Classes="primary"
+                                Content="🔍 スキャン"
+                                Command="{Binding ScanCommand}"
+                                IsEnabled="{Binding !IsBusy}"/>
+                    </Grid>
+                    <ProgressBar IsIndeterminate="True"
+                                 IsVisible="{Binding IsBusy}"
+                                 Height="3"/>
+                </StackPanel>
+            </Border>
+
+            <!-- スコア表示 -->
+            <Border Classes="card" IsVisible="{Binding HasResult}">
+                <Grid ColumnDefinitions="*,200">
+                    <StackPanel Grid.Column="0" Spacing="8">
+                        <TextBlock Text="スコア" FontSize="12"
+                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <TextBlock Text="{Binding ScoreText}"
+                                   FontSize="48" FontWeight="Bold"
+                                   Foreground="{StaticResource AccentBrush}"/>
+                        <TextBlock Text="{Binding LevelLabel}"
+                                   FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentBrush}"/>
+                    </StackPanel>
+                    <!-- スコアバー -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
+                        <TextBlock Text="危険度メーター" FontSize="11"
+                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <ProgressBar Value="{Binding ScoreFraction}"
+                                     Minimum="0" Maximum="1"
+                                     Height="12" CornerRadius="6">
+                            <ProgressBar.Transitions>
+                                <Transitions>
+                                    <DoubleTransition Property="Value" Duration="0:0:0.6"/>
+                                </Transitions>
+                            </ProgressBar.Transitions>
+                        </ProgressBar>
+                        <Grid ColumnDefinitions="*,*,*,*">
+                            <TextBlock Grid.Column="0" Text="低" FontSize="10"
+                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+                            <TextBlock Grid.Column="3" Text="危険" FontSize="10"
+                                       HorizontalAlignment="Right"
+                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- 理由リスト -->
+            <Border Classes="card" IsVisible="{Binding HasResult}">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="検出シグナル" FontSize="14" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <TextBlock Text="{Binding ReasonsText}"
+                               FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               FontFamily="Consolas, monospace"/>
+                </StackPanel>
+            </Border>
+
+            <!-- アクションボタン -->
+            <StackPanel Orientation="Horizontal" Spacing="10"
+                        IsVisible="{Binding HasResult}">
+                <Button Classes="outline" Content="⚡ Actions へ"
+                        Command="{Binding RequestActionCommand}"
+                        CommandParameter="goto"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

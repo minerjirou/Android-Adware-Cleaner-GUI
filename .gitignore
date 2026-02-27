@@ -1,1 +1,13 @@
-.git
+bin/
+obj/
+.vs/
+
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+TestResults/
+artifacts/
+
+build_args.txt

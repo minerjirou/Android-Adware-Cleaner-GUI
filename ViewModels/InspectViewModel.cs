@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using AdwScanGui.Models;
@@ -43,7 +46,7 @@ public partial class InspectViewModel : ObservableObject
         if (string.IsNullOrWhiteSpace(PackageName)) return;
         IsBusy    = true;
         HasResult = false;
-        ReasonText = "";
+        ReasonsText = "";
         DetailsText = "";
 
         try

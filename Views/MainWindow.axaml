@@ -1,7 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AdwScanGui.ViewModels"
-        xmlns:views="using:AdwScanGui.Views"
         x:Class="AdwScanGui.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="AdwScan — Android Adware Cleaner"
@@ -9,29 +8,26 @@
         MinWidth="800" MinHeight="560"
         Background="{StaticResource BgBaseBrush}">
 
-    <Design.DataContext>
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
-
     <Grid ColumnDefinitions="220,*">
 
-        <!-- ═══ Sidebar ════════════════════════════════════════════════ -->
+        <!-- ═══ Sidebar ═══ -->
         <Border Grid.Column="0"
                 Background="{StaticResource BgSurfaceBrush}"
                 BorderBrush="#1E2230" BorderThickness="0,0,1,0">
             <DockPanel Margin="12">
-                <!-- App Title -->
-                <StackPanel DockPanel.Dock="Top" Margin="0,8,0,24">
+
+                <!-- タイトル -->
+                <StackPanel DockPanel.Dock="Top" Margin="0,8,0,28">
                     <TextBlock Text="🤖 AdwScan"
                                FontSize="20" FontWeight="Bold"
-                               Foreground="{StaticResource AccentBrush}" />
+                               Foreground="{StaticResource AccentBrush}"/>
                     <TextBlock Text="Android Adware Cleaner"
                                FontSize="11"
                                Foreground="{StaticResource TextSecondaryBrush}"
                                Margin="0,2,0,0"/>
                 </StackPanel>
 
-                <!-- Device Status -->
+                <!-- デバイス状態 -->
                 <Border DockPanel.Dock="Bottom"
                         Background="{StaticResource BgElevatedBrush}"
                         CornerRadius="10" Padding="12,10" Margin="0,12,0,0">
@@ -46,31 +42,27 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Navigation -->
+                <!-- ナビゲーション -->
                 <StackPanel Spacing="4">
-                    <Button Classes="nav" Classes.active="{Binding SelectedTabIndex, Converter={x:Static vm:TabConverter.Is0}}"
-                            Command="{Binding SelectTabCommand}" CommandParameter="0">
+                    <Button Classes="nav" Command="{Binding SelectTabCommand}" CommandParameter="0">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <TextBlock Text="📡" FontSize="16"/>
                             <TextBlock Text="Monitor" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="nav" Classes.active="{Binding SelectedTabIndex, Converter={x:Static vm:TabConverter.Is1}}"
-                            Command="{Binding SelectTabCommand}" CommandParameter="1">
+                    <Button Classes="nav" Command="{Binding SelectTabCommand}" CommandParameter="1">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <TextBlock Text="📋" FontSize="16"/>
                             <TextBlock Text="Inventory" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="nav" Classes.active="{Binding SelectedTabIndex, Converter={x:Static vm:TabConverter.Is2}}"
-                            Command="{Binding SelectTabCommand}" CommandParameter="2">
+                    <Button Classes="nav" Command="{Binding SelectTabCommand}" CommandParameter="2">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <TextBlock Text="🔍" FontSize="16"/>
                             <TextBlock Text="Inspect" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="nav" Classes.active="{Binding SelectedTabIndex, Converter={x:Static vm:TabConverter.Is3}}"
-                            Command="{Binding SelectTabCommand}" CommandParameter="3">
+                    <Button Classes="nav" Command="{Binding SelectTabCommand}" CommandParameter="3">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <TextBlock Text="⚡" FontSize="16"/>
                             <TextBlock Text="Actions" VerticalAlignment="Center"/>
@@ -80,14 +72,12 @@
             </DockPanel>
         </Border>
 
-        <!-- ═══ Content Area ═══════════════════════════════════════════ -->
+        <!-- ═══ Content ═══ -->
         <TransitioningContentControl Grid.Column="1"
-                                     Content="{Binding CurrentView}"
-                                     Margin="0">
+                                     Content="{Binding CurrentView}">
             <TransitioningContentControl.PageTransition>
                 <CrossFade Duration="0:0:0.2"/>
             </TransitioningContentControl.PageTransition>
         </TransitioningContentControl>
-
     </Grid>
 </Window>

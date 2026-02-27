@@ -1,3 +1,5 @@
+using System;
+
 namespace AdwScanGui.Models;
 
 public record Event(

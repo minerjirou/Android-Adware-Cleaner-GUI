@@ -28,7 +28,7 @@
 
     <Application.Styles>
         <FluentTheme />
-        <StyleInclude Source="avares://Avalonia.Fonts.Inter/Fonts.axaml"/>
+        <!-- <StyleInclude Source="avares://Avalonia.Fonts.Inter/Assets/Fonts.axaml"/> -->
 
         <Style Selector="Window">
             <Setter Property="Background" Value="{StaticResource BgBaseBrush}" />

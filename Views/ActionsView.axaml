@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AdwScanGui.ViewModels"
+             x:Class="AdwScanGui.Views.ActionsView"
+             x:DataType="vm:ActionsViewModel">
+    <DockPanel Margin="24">
+        <!-- ヘッダー -->
+        <TextBlock DockPanel.Dock="Top"
+                   Text="⚡ Actions" FontSize="22" FontWeight="Bold"
+                   Foreground="{StaticResource TextPrimaryBrush}"
+                   Margin="0,0,0,16"/>
+
+        <!-- 操作パネル -->
+        <Border Classes="card" DockPanel.Dock="Top" Margin="0,0,0,16">
+            <StackPanel Spacing="12">
+                <!-- パッケージ名 -->
+                <TextBlock Text="対象パッケージ名" FontSize="12"
+                           Foreground="{StaticResource TextSecondaryBrush}"/>
+                <TextBox Text="{Binding PackageName}"
+                         Watermark="例: com.example.suspicious"/>
+
+                <!-- dry-run トグル -->
+                <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,4,0,0">
+                    <ToggleSwitch IsChecked="{Binding DryRun}"
+                                  OnContent="dry-run ON（実際には実行しない）"
+                                  OffContent="実行モード（実際に操作）"/>
+                </StackPanel>
+
+                <!-- アクションボタン -->
+                <WrapPanel Orientation="Horizontal">
+                    <Button Classes="outline" Content="🔒 Quarantine"
+                            Margin="0,0,8,0"
+                            Command="{Binding QuarantineCommand}"
+                            IsEnabled="{Binding !IsBusy}"/>
+                    <Button Classes="danger" Content="🗑 Remove"
+                            Margin="0,0,8,0"
+                            Command="{Binding RemoveCommand}"
+                            IsEnabled="{Binding !IsBusy}"/>
+                    <Button Classes="outline" Content="♻ Restore"
+                            Command="{Binding RestoreCommand}"
+                            IsEnabled="{Binding !IsBusy}"/>
+                </WrapPanel>
+
+                <ProgressBar IsIndeterminate="True"
+                             IsVisible="{Binding IsBusy}"
+                             Height="3"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ログ出力 -->
+        <Border Classes="card">
+            <DockPanel>
+                <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                    <TextBlock Text="実行ログ" FontSize="13" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               VerticalAlignment="Center"/>
+                    <Button Classes="outline" Content="クリア"
+                            Command="{Binding ClearLogCommand}"
+                            HorizontalAlignment="Right"
+                            FontSize="11" Padding="8,4"/>
+                </DockPanel>
+                <ScrollViewer>
+                    <TextBlock Text="{Binding Log}"
+                               FontFamily="Consolas, monospace"
+                               FontSize="12"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               TextWrapping="Wrap"/>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+    </DockPanel>
+</UserControl>

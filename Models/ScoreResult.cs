@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace AdwScanGui.Models;
 
 public record ScoreResult(

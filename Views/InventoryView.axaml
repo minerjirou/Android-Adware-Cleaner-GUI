@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AdwScanGui.ViewModels"
+             x:Class="AdwScanGui.Views.InventoryView"
+             x:DataType="vm:InventoryViewModel">
+    <DockPanel Margin="24">
+        <!-- ヘッダー -->
+        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+            <TextBlock Text="📋 Inventory" FontSize="22" FontWeight="Bold"
+                       Foreground="{StaticResource TextPrimaryBrush}"
+                       VerticalAlignment="Center"/>
+            <Button Classes="primary" Content="🔄 一覧更新"
+                    Command="{Binding RefreshCommand}"
+                    HorizontalAlignment="Right"/>
+        </DockPanel>
+
+        <!-- ステータス -->
+        <TextBlock DockPanel.Dock="Top"
+                   Text="{Binding StatusText}"
+                   Foreground="{StaticResource TextSecondaryBrush}"
+                   FontSize="12" Margin="0,0,0,12"/>
+
+        <!-- ローディング -->
+        <ProgressBar DockPanel.Dock="Top"
+                     IsIndeterminate="True"
+                     IsVisible="{Binding IsBusy}"
+                     Margin="0,0,0,12" Height="3"/>
+
+        <!-- パッケージ一覧 -->
+        <Border Classes="card" Padding="0">
+            <ListBox ItemsSource="{Binding Packages}"
+                     Background="Transparent">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:PackageItem">
+                        <Grid ColumnDefinitions="*,80,100" Margin="12,6">
+                            <TextBlock Grid.Column="0"
+                                       Text="{Binding Package}"
+                                       FontSize="13"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding Status}"
+                                       FontSize="11"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"/>
+                            <Button Grid.Column="2"
+                                    Classes="outline"
+                                    Content="🔍 Inspect"
+                                    FontSize="11" Padding="8,4"
+                                    Command="{Binding $parent[ListBox].((vm:InventoryViewModel)DataContext).InspectCommand}"
+                                    CommandParameter="{Binding}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+    </DockPanel>
+</UserControl>
