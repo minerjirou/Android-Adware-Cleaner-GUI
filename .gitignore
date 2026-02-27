@@ -12,3 +12,4 @@ artifacts/
 
 build_args.txt
 run_output.txt
+run_check.txt
