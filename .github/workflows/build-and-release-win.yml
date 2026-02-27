@@ -2,11 +2,11 @@ name: Build and Release Windows EXE
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"] # 通常コミットはCIのみ
     tags:
-      - "v*"
+      - "v*" # 正式リリースはタグで実行
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -34,14 +34,17 @@ jobs:
           $exeName = "AdwScanGui.exe"
           $ref = "${env:GITHUB_REF}"
           $version = "0.0.0-ci"
+          $releaseName = "CI Build"
 
           if ($ref -like "refs/tags/v*") {
             $tag = $ref.Substring("refs/tags/".Length)  # v1.2.3
             $version = $tag.TrimStart("v")              # 1.2.3
+            $releaseName = "Android-Adware-Cleaner-GUI v$version"
           }
 
-          "exe_name=$exeName" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-          "version=$version"  | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "exe_name=$exeName"      | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "version=$version"       | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "release_name=$releaseName" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
       # NativeTools/Win に ADB 3ファイルを配置（CI用）
       - name: Prepare Android Platform-Tools (ADB)
@@ -129,6 +132,7 @@ jobs:
           "zip_path=$zipPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "zip_name=$zipName" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
+      # CI用途の成果物（main push / PR / 手動実行）
       - name: Upload artifact (CI)
         uses: actions/upload-artifact@v4
         with:
@@ -137,17 +141,23 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      - name: Upload raw EXE artifact (optional)
-        uses: actions/upload-artifact@v4
-        with:
-          name: AdwScanGui-exe-raw
-          path: bin/Release/net9.0/win-x64/publish/AdwScanGui.exe
-          if-no-files-found: error
-          retention-days: 14
-
-      - name: Create / Update GitHub Release (tag only)
+      # 正式リリース（タグ時のみ）
+      - name: Create GitHub Release (official release only)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          generate_release_notes: true
+          tag_name: ${{ github.ref_name }}
+          name: ${{ steps.meta.outputs.release_name }}
+          target_commitish: ${{ github.sha }}
           files: ${{ steps.package.outputs.zip_path }}
+
+          # ★ここで変更点を自動生成（正式リリース時のみ）
+          generate_release_notes: true
+
+          # 正式リリース扱い
+          prerelease: false
+          make_latest: true
+
+          # 任意: 自動ノートの先頭に短い説明を付けたいときだけ有効化
+          # body: |
+          #   Windows x64 self-contained build.
