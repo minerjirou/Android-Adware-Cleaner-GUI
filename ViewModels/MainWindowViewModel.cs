@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Net.Http;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -12,6 +13,7 @@ public partial class MainWindowViewModel : ObservableObject
     public AdbService     Adb     { get; }
     public StateService   State   { get; }
     public ScannerService Scanner { get; }
+    public PlayStoreService PlayStore { get; }
 
     public MonitorViewModel   Monitor   { get; }
     public InventoryViewModel Inventory { get; }
@@ -28,9 +30,10 @@ public partial class MainWindowViewModel : ObservableObject
         Adb     = new AdbService();
         State   = new StateService();
         Scanner = new ScannerService();
+        PlayStore = new PlayStoreService(new HttpClient());
 
         Monitor   = new MonitorViewModel(Adb, State);
-        Inventory = new InventoryViewModel(Adb, State, Scanner);
+        Inventory = new InventoryViewModel(Adb, State, Scanner, PlayStore);
         Inspect   = new InspectViewModel(Adb, State, Scanner);
         Actions   = new ActionsViewModel(Adb, State);
 

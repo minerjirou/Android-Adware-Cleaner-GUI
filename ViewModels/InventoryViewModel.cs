@@ -13,6 +13,7 @@ public partial class InventoryViewModel : ObservableObject
     private readonly AdbService     _adb;
     private readonly StateService   _state;
     private readonly ScannerService _scanner;
+    private readonly PlayStoreService _play;
 
     [ObservableProperty] private bool   _isBusy;
     [ObservableProperty] private string _statusText = "アプリ一覧を更新してください";
@@ -22,11 +23,12 @@ public partial class InventoryViewModel : ObservableObject
     // 選択パッケージを外部から購読可能にする
     public event Action<string>? InspectRequested;
 
-    public InventoryViewModel(AdbService adb, StateService state, ScannerService scanner)
+    public InventoryViewModel(AdbService adb, StateService state, ScannerService scanner, PlayStoreService play)
     {
         _adb     = adb;
         _state   = state;
         _scanner = scanner;
+        _play    = play;
     }
 
     [RelayCommand]
@@ -39,12 +41,21 @@ public partial class InventoryViewModel : ObservableObject
         try
         {
             var pkgs = await _adb.ListUserPackagesAsync();
-            StatusText = $"{pkgs.Count} 件のユーザーアプリ（名前解決中...）";
+            StatusText = $"{pkgs.Count} 件のユーザーアプリ（Google Play名を取得中...）";
             foreach (var pkg in pkgs)
             {
                 var actioned = _state.IsActioned(pkg);
-                var label = await _adb.GetPackageLabelAsync(pkg);
-                var displayName = string.IsNullOrWhiteSpace(label) ? pkg : label;
+                string? playName = null;
+                try
+                {
+                    playName = await _play.GetAppNameAsync(pkg, "ja", "JP");
+                }
+                catch
+                {
+                    // フォールバックで package 名表示
+                }
+
+                var displayName = string.IsNullOrWhiteSpace(playName) ? pkg : playName;
 
                 var item = new PackageItem(
                     pkg,
