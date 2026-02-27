@@ -33,12 +33,19 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="vm:PackageItem">
                         <Grid ColumnDefinitions="*,80,100" Margin="12,6">
-                            <TextBlock Grid.Column="0"
-                                       Text="{Binding Package}"
-                                       FontSize="13"
-                                       Foreground="{StaticResource TextPrimaryBrush}"
-                                       VerticalAlignment="Center"
-                                       TextTrimming="CharacterEllipsis"/>
+                            <StackPanel Grid.Column="0" Spacing="2">
+                                <TextBlock Text="{Binding DisplayName}"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimaryBrush}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding Package}"
+                                           FontSize="11"
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
                             <TextBlock Grid.Column="1"
                                        Text="{Binding Status}"
                                        FontSize="11"

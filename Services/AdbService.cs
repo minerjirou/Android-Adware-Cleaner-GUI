@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -23,6 +24,12 @@ public class AdbService : IDisposable
 
     private static readonly Regex DisplayedRe = new(
         @"Displayed\s+([A-Za-z0-9._]+)/([A-Za-z0-9.$_/\-]+)",
+        RegexOptions.Compiled);
+
+    private readonly ConcurrentDictionary<string, string> _appLabelCache = new(StringComparer.Ordinal);
+
+    private static readonly Regex AppLabelRe = new(
+        @"application-label(?<locale>(?:-[A-Za-z0-9_]+)?)\s*:\s*'(?<label>(?:\\.|[^'])*)'",
         RegexOptions.Compiled);
 
     public string? Serial
@@ -236,6 +243,74 @@ public class AdbService : IDisposable
     {
         var (out1, out2, _) = await ShellAsync(new[] { "dumpsys", "package", pkg }, 40_000, ct);
         return out1 + (string.IsNullOrEmpty(out2) ? "" : "\n" + out2);
+    }
+
+    private static string? ParseApplicationLabel(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return null;
+
+        var matches = AppLabelRe.Matches(text);
+        if (matches.Count == 0)
+            return null;
+
+        Match? best = null;
+        var bestScore = int.MinValue;
+
+        foreach (Match m in matches)
+        {
+            var locale = m.Groups["locale"].Value; // "", "-ja", "-ja-JP" など
+            var score =
+                locale.StartsWith("-ja", StringComparison.OrdinalIgnoreCase) ? 3 :
+                string.IsNullOrEmpty(locale) ? 2 : 1;
+
+            if (score > bestScore)
+            {
+                bestScore = score;
+                best = m;
+            }
+        }
+
+        if (best == null)
+            return null;
+
+        var label = Regex.Unescape(best.Groups["label"].Value).Trim();
+        return string.IsNullOrWhiteSpace(label) ? null : label;
+    }
+
+    public async Task<string?> GetPackageLabelAsync(string pkg, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(pkg))
+            return null;
+
+        if (_appLabelCache.TryGetValue(pkg, out var cached))
+            return cached;
+
+        string? label = null;
+
+        // 1) dumpsys package <pkg>
+        try
+        {
+            var ds = await DumpsysPackageAsync(pkg, ct);
+            label = ParseApplicationLabel(ds);
+        }
+        catch { }
+
+        // 2) フォールバック: pm dump <pkg>
+        if (string.IsNullOrWhiteSpace(label))
+        {
+            try
+            {
+                var (out1, out2, _) = await ShellAsync(new[] { "pm", "dump", pkg }, 40_000, ct);
+                label = ParseApplicationLabel(out1 + (string.IsNullOrEmpty(out2) ? "" : "\n" + out2));
+            }
+            catch { }
+        }
+
+        if (!string.IsNullOrWhiteSpace(label))
+            _appLabelCache[pkg] = label;
+
+        return label;
     }
 
     public async Task<string> AppopsGetAsync(string pkg, CancellationToken ct = default)

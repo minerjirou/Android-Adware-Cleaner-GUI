@@ -39,13 +39,23 @@ public partial class InventoryViewModel : ObservableObject
         try
         {
             var pkgs = await _adb.ListUserPackagesAsync();
-            StatusText = $"{pkgs.Count} 件のユーザーアプリ";
+            StatusText = $"{pkgs.Count} 件のユーザーアプリ（名前解決中...）";
             foreach (var pkg in pkgs)
             {
                 var actioned = _state.IsActioned(pkg);
-                var item = new PackageItem(pkg, actioned ? "対処済み" : "未評価", ScoreLevel.Low, -1);
+                var label = await _adb.GetPackageLabelAsync(pkg);
+                var displayName = string.IsNullOrWhiteSpace(label) ? pkg : label;
+
+                var item = new PackageItem(
+                    pkg,
+                    displayName,
+                    actioned ? "対処済み" : "未評価",
+                    ScoreLevel.Low,
+                    -1);
                 Packages.Add(item);
             }
+
+            StatusText = $"{pkgs.Count} 件のユーザーアプリ";
         }
         catch (Exception ex)
         {
@@ -62,7 +72,7 @@ public partial class InventoryViewModel : ObservableObject
     }
 }
 
-public record PackageItem(string Package, string Status, ScoreLevel Level, int Score)
+public record PackageItem(string Package, string DisplayName, string Status, ScoreLevel Level, int Score)
 {
     public string ScoreLabel => Score < 0 ? "—" : Score.ToString();
 }
