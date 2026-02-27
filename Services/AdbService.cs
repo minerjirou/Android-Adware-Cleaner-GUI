@@ -19,6 +19,7 @@ namespace AdwScanGui.Services;
 public class AdbService : IDisposable
 {
     private string _adbPath;
+    private readonly string _workingDirectory;
     private string? _serial;
     private bool _disposed;
 
@@ -42,6 +43,7 @@ public class AdbService : IDisposable
     {
         _serial = serial;
         _adbPath = ExtractAdb();
+        _workingDirectory = ResolveWorkingDirectory(_adbPath);
     }
 
     // ── ADB バイナリの展開 ──────────────────────────────────────────
@@ -104,6 +106,20 @@ public class AdbService : IDisposable
         return destPath;
     }
 
+    private static string ResolveWorkingDirectory(string adbPath)
+    {
+        if (Path.IsPathRooted(adbPath))
+        {
+            var dir = Path.GetDirectoryName(adbPath);
+            if (!string.IsNullOrWhiteSpace(dir))
+                return dir;
+        }
+
+        var fallback = Path.Combine(Path.GetTempPath(), "adwscangui");
+        Directory.CreateDirectory(fallback);
+        return fallback;
+    }
+
     // ── コマンド実行 ──────────────────────────────────────────────
     private List<string> BaseArgs()
     {
@@ -130,6 +146,7 @@ public class AdbService : IDisposable
             CreateNoWindow         = true,
             StandardOutputEncoding = System.Text.Encoding.UTF8,
             StandardErrorEncoding  = System.Text.Encoding.UTF8,
+            WorkingDirectory       = _workingDirectory,
         };
         foreach (var a in allArgs)
             psi.ArgumentList.Add(a);
@@ -199,6 +216,7 @@ public class AdbService : IDisposable
             UseShellExecute        = false,
             CreateNoWindow         = true,
             StandardOutputEncoding = System.Text.Encoding.UTF8,
+            WorkingDirectory       = _workingDirectory,
         };
         foreach (var a in args) psi.ArgumentList.Add(a);
 
@@ -377,6 +395,27 @@ public class AdbService : IDisposable
     {
         if (_disposed) return;
         _disposed = true;
+        TryKillServer();
         // 一時展開したadbは他プロセスが使う可能性があるため削除しない
+    }
+
+    private void TryKillServer()
+    {
+        try
+        {
+            var psi = new ProcessStartInfo(_adbPath)
+            {
+                UseShellExecute = false,
+                CreateNoWindow  = true,
+                WorkingDirectory = _workingDirectory,
+            };
+            psi.ArgumentList.Add("kill-server");
+            using var proc = Process.Start(psi);
+            proc?.WaitForExit(3000);
+        }
+        catch
+        {
+            // 終了時のベストエフォート。例外は握りつぶす。
+        }
     }
 }

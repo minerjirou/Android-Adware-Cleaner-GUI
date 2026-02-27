@@ -8,7 +8,7 @@ using AdwScanGui.Services;
 
 namespace AdwScanGui.ViewModels;
 
-public partial class MainWindowViewModel : ObservableObject
+public partial class MainWindowViewModel : ObservableObject, IDisposable
 {
     public AdbService     Adb     { get; }
     public StateService   State   { get; }
@@ -24,6 +24,7 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty] private string _deviceStatus = "デバイス未接続";
     [ObservableProperty] private bool   _deviceConnected;
     [ObservableProperty] private object? _currentView;
+    private bool _disposed;
 
     public MainWindowViewModel()
     {
@@ -108,5 +109,13 @@ public partial class MainWindowViewModel : ObservableObject
             }
             await Task.Delay(5000);
         }
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        Adb.Dispose();
+        PlayStore.Dispose();
     }
 }
