@@ -8,7 +8,7 @@
 
 | 項目 | 内容 |
 |------|------|
-| プロジェクトパス | `c:\Users\Y_Kofuji\Documents\Android-Adware-Cleaner\AdwScanGui\` |
+| プロジェクトパス | `C:\Users\Y_Kofuji\Documents\Android-Adware-Cleaner-GUI` |
 | 言語 | C# (.NET 9) |
 | UIフレームワーク | Avalonia UI 11.3.12 |
 | MVVMライブラリ | CommunityToolkit.Mvvm 8.4.0 |
