@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using AdwScanGui.ViewModels;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AdwScanGui;
 
@@ -32,6 +33,6 @@ public class ViewLocator : IDataTemplate
 
     public bool Match(object? data)
     {
-        return data is not null;
+        return data is ObservableObject;
     }
 }
