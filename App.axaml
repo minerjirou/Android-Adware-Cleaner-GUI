@@ -4,6 +4,10 @@
              xmlns:local="using:AdwScanGui"
              RequestedThemeVariant="Dark">
 
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
+
     <Application.Resources>
         <!-- Color Palette -->
         <Color x:Key="BgBase">#0F1117</Color>
