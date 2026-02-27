@@ -1,0 +1,153 @@
+name: Build and Release Windows EXE
+
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+      - "v*"
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-win-x64:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Resolve metadata
+        id: meta
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $exeName = "AdwScanGui.exe"
+          $ref = "${env:GITHUB_REF}"
+          $version = "0.0.0-ci"
+
+          if ($ref -like "refs/tags/v*") {
+            $tag = $ref.Substring("refs/tags/".Length)  # v1.2.3
+            $version = $tag.TrimStart("v")              # 1.2.3
+          }
+
+          "exe_name=$exeName" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "version=$version"  | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      # NativeTools/Win に ADB 3ファイルを配置（CI用）
+      - name: Prepare Android Platform-Tools (ADB)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $dst = Join-Path $PWD "NativeTools\Win"
+          New-Item -ItemType Directory -Force -Path $dst | Out-Null
+
+          $zipPath = Join-Path $env:RUNNER_TEMP "platform-tools-latest-windows.zip"
+          $extractRoot = Join-Path $env:RUNNER_TEMP "platform-tools-extract"
+
+          Invoke-WebRequest `
+            -Uri "https://dl.google.com/android/repository/platform-tools-latest-windows.zip" `
+            -OutFile $zipPath
+
+          Expand-Archive -Path $zipPath -DestinationPath $extractRoot -Force
+
+          $src = Join-Path $extractRoot "platform-tools"
+
+          Copy-Item (Join-Path $src "adb.exe")          (Join-Path $dst "adb.exe") -Force
+          Copy-Item (Join-Path $src "AdbWinApi.dll")    (Join-Path $dst "AdbWinApi.dll") -Force
+          Copy-Item (Join-Path $src "AdbWinUsbApi.dll") (Join-Path $dst "AdbWinUsbApi.dll") -Force
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Publish (win-x64 single-file self-contained)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $version = "${{ steps.meta.outputs.version }}"
+          $versionArgs = @()
+
+          if ($version -ne "0.0.0-ci") {
+            $versionArgs += "-p:Version=$version"
+            $versionArgs += "-p:AssemblyVersion=$version.0"
+            $versionArgs += "-p:FileVersion=$version.0"
+            $versionArgs += "-p:InformationalVersion=$version"
+          }
+
+          dotnet publish "AdwScanGui.csproj" `
+            -c Release `
+            -r win-x64 `
+            -p:PublishSingleFile=true `
+            --self-contained true `
+            @versionArgs
+
+      - name: Verify publish output
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $publishDir = Join-Path $PWD "bin\Release\net9.0\win-x64\publish"
+          if (-not (Test-Path $publishDir)) {
+            throw "Publish directory not found: $publishDir"
+          }
+
+          $exePath = Join-Path $publishDir "${{ steps.meta.outputs.exe_name }}"
+          if (-not (Test-Path $exePath)) {
+            Get-ChildItem $publishDir | Format-Table -AutoSize
+            throw "EXE not found: $exePath"
+          }
+
+      - name: Package zip
+        id: package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $publishDir = Join-Path $PWD "bin\Release\net9.0\win-x64\publish"
+          $version = "${{ steps.meta.outputs.version }}"
+
+          if ($version -eq "0.0.0-ci") {
+            $zipName = "AdwScanGui-win-x64-ci.zip"
+          } else {
+            $zipName = "AdwScanGui-win-x64-v$version.zip"
+          }
+
+          $zipPath = Join-Path $env:RUNNER_TEMP $zipName
+          Compress-Archive -Path (Join-Path $publishDir "*") -DestinationPath $zipPath -Force
+
+          "zip_path=$zipPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "zip_name=$zipName" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Upload artifact (CI)
+        uses: actions/upload-artifact@v4
+        with:
+          name: AdwScanGui-win-x64
+          path: ${{ steps.package.outputs.zip_path }}
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload raw EXE artifact (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: AdwScanGui-exe-raw
+          path: bin/Release/net9.0/win-x64/publish/AdwScanGui.exe
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Create / Update GitHub Release (tag only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: ${{ steps.package.outputs.zip_path }}
